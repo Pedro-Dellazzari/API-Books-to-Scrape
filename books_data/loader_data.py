@@ -84,7 +84,7 @@ def coleta_atributos_livro(link):
     categoria = soup.find('ul', class_='breadcrumb').find_all('li')[2].text.strip()
 
     preco_eur = float(re.search(r'\d+\.\d+', soup.find('p', class_='price_color').text).group())
-    preco_brl = preco_eur * valor_euro_para_real
+    preco_brl = round(preco_eur * valor_euro_para_real, 2)
 
     estoque = int(re.search(r'\d+', soup.find('p', class_='instock availability').text.strip()).group())
     review = soup.find('p', class_='star-rating')['class'][1]
