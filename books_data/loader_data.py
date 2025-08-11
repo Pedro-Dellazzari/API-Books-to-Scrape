@@ -5,24 +5,42 @@ import re
 import time
 from urllib.parse import urljoin
 
-import duckdb
+import psycopg2
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 from handsome_log import get_logger
 
 logger = get_logger(__name__)
 
 
-#banco 
-con = duckdb.connect(database='books.db', read_only=False)
+# Conexão com o Postgres
+PG_HOST = os.getenv('POSTGRES_ENDPOINT')
+PG_PORT = os.getenv('POSTGRES_PORT')
+PG_USER = os.getenv('POSTGRES_USER')
+PG_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+PG_DB = os.getenv('POSTGRES_DATABASE')
 
-con.execute("""
+con = psycopg2.connect(
+    host=PG_HOST,
+    port=PG_PORT,
+    user=PG_USER,
+    password=PG_PASSWORD,
+    dbname=PG_DB
+)
+con.autocommit = True
+cur = con.cursor()
+
+cur.execute("""
 CREATE TABLE IF NOT EXISTS livros(
     upc_livro TEXT PRIMARY KEY,
     titulo TEXT,
     imagem TEXT,
     categoria TEXT,
-    valor_principal_em_euros DOUBLE,
-    valor_principal_em_reais DOUBLE,
+    valor_principal_em_euros DOUBLE PRECISION,
+    valor_principal_em_reais DOUBLE PRECISION,
     inventario INTEGER,
     review TEXT,
     sinopse TEXT,    
@@ -93,8 +111,20 @@ def coleta_atributos_livro(link):
     upc = soup.find('th', text='UPC').find_next_sibling('td').text
     num_reviews = int(soup.find('th', text='Number of reviews').find_next_sibling('td').text)
 
-    con.execute("""
-        INSERT OR REPLACE INTO livros VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    cur.execute("""
+        INSERT INTO livros (upc_livro, titulo, imagem, categoria, valor_principal_em_euros, valor_principal_em_reais, inventario, review, sinopse, num_reviews, link)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (upc_livro) DO UPDATE SET
+            titulo = EXCLUDED.titulo,
+            imagem = EXCLUDED.imagem,
+            categoria = EXCLUDED.categoria,
+            valor_principal_em_euros = EXCLUDED.valor_principal_em_euros,
+            valor_principal_em_reais = EXCLUDED.valor_principal_em_reais,
+            inventario = EXCLUDED.inventario,
+            review = EXCLUDED.review,
+            sinopse = EXCLUDED.sinopse,
+            num_reviews = EXCLUDED.num_reviews,
+            link = EXCLUDED.link
     """, (upc, titulo, imagem, categoria, preco_eur, preco_brl, estoque, review, sinopse, num_reviews, link))
 #Função de paginação
 def verificar_paginacao(soup):
@@ -129,4 +159,5 @@ if __name__ == "__main__":
             logger.error(f"Não foi possível pegar a info do livro: {e}")
             pass
 
+    cur.close()
     con.close()
