@@ -20,7 +20,7 @@ from models.stats_responses import OverviewStats, CategoryStatsResponse
 from typing import Annotated, Optional
 
 #criando o app
-app = FastAPI(title="API Books to Scrape")
+app = FastAPI(title="API Books to Scrape", redirect_slashes=False)
 
 #Função health normal da API
 @app.get("/health")
