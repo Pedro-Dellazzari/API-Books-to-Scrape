@@ -12,6 +12,9 @@ from api.crud import get_generic_livros, get_livro_by_id, search_livros, get_all
 from api.stats import get_overview_stats, get_category_stats
 from api.health import check_health
 
+#Auth
+from auth.endpoints import router as auth_router
+
 #Modelos Pydantic
 from models.livros import Livro_Generico, Response_Livro_Generico, Response_Categories, HealthCheck, Response_Price_Range
 from models.stats_responses import OverviewStats, CategoryStatsResponse
@@ -21,6 +24,9 @@ from typing import Annotated, Optional
 
 #criando o app
 app = FastAPI(title="API Books to Scrape", redirect_slashes=False)
+
+#Incluindo routers
+app.include_router(auth_router)
 
 #Função health normal da API
 @app.get("/health")
