@@ -16,6 +16,9 @@ from api.health import check_health
 from auth.endpoints import router as auth_router, get_current_active_user
 from models.auth import User
 
+#ML
+from ml.endpoints import router as ml_router
+
 #Modelos Pydantic
 from models.livros import Livro_Generico, Response_Livro_Generico, Response_Categories, HealthCheck, Response_Price_Range
 from models.stats_responses import OverviewStats, CategoryStatsResponse
@@ -28,6 +31,7 @@ app = FastAPI(title="API Books to Scrape", redirect_slashes=False)
 
 #Incluindo routers
 app.include_router(auth_router)
+app.include_router(ml_router)
 
 #Função health normal da API
 @app.get("/health")

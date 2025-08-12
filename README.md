@@ -49,20 +49,14 @@ API Books to Scrape/
 - PostgreSQL 12+
 - Git
 
-### 1. Clone o repositório
 
-```bash
-git clone <repository-url>
-cd "API Books to Scrape"
-```
-
-### 2. Instale as dependências
+### 1. Instale as dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configuração do Banco de Dados
+### 2. Configuração do Banco de Dados
 
 Configure as variáveis de ambiente:
 
@@ -76,14 +70,14 @@ POSTGRES_PASSWORD=sua_senha
 JWT_SECRET_KEY=sua_chave_secreta_super_segura
 ```
 
-### 4. Execute o script de população de usuários
+### 3. Execute o script de população de usuários
 
 ```bash
 cd auth
 python3 populate_users.py
 ```
 
-### 5. Inicie a aplicação
+### 4. Inicie a aplicação
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
